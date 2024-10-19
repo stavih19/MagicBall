@@ -2,6 +2,7 @@ import cv2
 import numpy as np
 
 
+# cutting out the circle that we detect
 def cut_circles(circles, image, gray):
     circles = np.uint16(np.around(circles))
 
@@ -24,4 +25,5 @@ def cut_circles(circles, image, gray):
 
         cropped_circle = circle_image[y_min:y_max, x_min:x_max]
         cropped_circles.append(cropped_circle)
+
     return cropped_circles

@@ -2,14 +2,15 @@ import torch
 import torchvision.models as models
 import torchvision.transforms as transforms
 import os
-from sklearn.ensemble import RandomForestClassifier
 from sklearn.model_selection import train_test_split
 from PIL import Image
 import joblib
 from sklearn.svm import SVC
+from torchvision.models import ResNet18_Weights
+import random
 
 # Load a pre-trained ResNet model and remove the last layer
-model = models.resnet18(weights=True)
+model = models.resnet18(weights=ResNet18_Weights.DEFAULT)
 model = torch.nn.Sequential(*list(model.children())[:-1])
 model.eval()  # Set the model to evaluation mode
 
@@ -19,6 +20,21 @@ transform = transforms.Compose([
     transforms.ToTensor(),
     transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
 ])
+
+# # Define combined transform
+# combined_transform = transforms.Compose([
+#     transforms.RandomResizedCrop(224),
+#     transforms.RandomHorizontalFlip(),
+#
+#     # Lambda function to apply grayscale transform conditionally
+#     transforms.Lambda(lambda img: img.convert("L").convert("RGB") if random.random() < 0.5 else img),
+#
+#     # ColorJitter for color augmentation (also applies to grayscale since it's converted back to 3 channels)
+#     transforms.ColorJitter(brightness=0.5, contrast=0.5, saturation=0.5, hue=0.1),
+#
+#     transforms.ToTensor(),
+#     transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])  # Normalize for ResNet
+# ])
 
 
 def extract_features(img):
@@ -88,8 +104,11 @@ def svc_interference(img, svc_classifier):
 
 
 if __name__ == '__main__':
-    image_path = 'D:\\PythonProjects\\MagicBall\\Find the ball\\Special Ball\\challenge_image.png'
-    img = Image.open(image_path)
-    svc_classifier = joblib.load('svc_model.pkl')
-    prediction = svc_pil_interference(img, svc_classifier)
-    print(prediction)
+    train_model()
+
+
+    # image_path = 'D:\\PythonProjects\\MagicBall\\Find the ball\\Special Ball\\challenge_image.png'
+    # img = Image.open(image_path)
+    # svc_classifier = joblib.load('svc_model.pkl')
+    # prediction = svc_pil_interference(img, svc_classifier)
+    # print(prediction)
